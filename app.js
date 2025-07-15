@@ -61,22 +61,36 @@ const defaultMaterias = {
 };
 
 let materias = JSON.parse(localStorage.getItem('mallaFAUD')) || defaultMaterias;
+let collapsedYears = JSON.parse(localStorage.getItem('collapsedYears')) || [];
 
 function guardarProgreso() {
   localStorage.setItem('mallaFAUD', JSON.stringify(materias));
   actualizarBarraProgreso();
 }
 
+function guardarEstadoColapsado() {
+  localStorage.setItem('collapsedYears', JSON.stringify(collapsedYears));
+}
+
 function crearMalla(filtro = 'Todas') {
   const malla = document.getElementById('malla');
   malla.innerHTML = "";
   let todasMaterias = [];
+
   for (const [anio, lista] of Object.entries(materias)) {
     const columna = document.createElement('div');
     columna.className = 'year-column';
+    columna.dataset.year = anio; // Store year for collapsing
+
     const titulo = document.createElement('h2');
     titulo.textContent = anio;
+    titulo.addEventListener('click', () => toggleCollapse(anio)); // Add click listener to title
     columna.appendChild(titulo);
+
+    // Apply collapsed state from localStorage
+    if (collapsedYears.includes(anio)) {
+        columna.classList.add('collapsed');
+    }
 
     lista.forEach(materia => {
       todasMaterias.push(materia);
@@ -95,7 +109,7 @@ function crearMalla(filtro = 'Todas') {
         card.appendChild(periodo);
 
         const select = document.createElement('select');
-        ["Aprobada", "En Curso", "Pendiente"].forEach(estado => {
+        ["Aprobada", "En Curso", "Regularizada", "Pendiente"].forEach(estado => { // Added Regularizada
           const option = document.createElement('option');
           option.value = estado;
           option.textContent = estado;
@@ -104,13 +118,13 @@ function crearMalla(filtro = 'Todas') {
         });
         select.addEventListener('change', e => {
           materia.estado = e.target.value;
-          if (materia.estado !== 'Aprobada') {
+          if (materia.estado === 'Aprobada') {
+            if (materia.nota === null) materia.nota = 7; // Default note if approved and no note exists
+          } else {
             materia.nota = null; // Clear note if not approved
-          } else if (materia.nota === null) {
-             materia.nota = 7; // Default note if approved and no note exists
           }
           guardarProgreso();
-          crearMalla(filtro);
+          crearMalla(filtro); // Re-render to update disabled states
         });
         card.appendChild(select);
 
@@ -131,7 +145,7 @@ function crearMalla(filtro = 'Todas') {
         card.appendChild(notaInput);
 
         if (isDisabled && materia.correlativas && materia.correlativas.length > 0) {
-            const correlativasPendientes = materia.correlativas.filter(correl => !estaAprobada(correl));
+            const correlativasPendientes = materia.correlativas.filter(correl => !estaAprobada(correl) && !estaRegularizada(correl));
             if (correlativasPendientes.length > 0) {
                 const info = document.createElement('div');
                 info.className = 'correlatives-info';
@@ -155,6 +169,7 @@ function filtrar(filtro) {
 function claseEstado(estado) {
   if (estado === 'Aprobada') return 'aprobada';
   if (estado === 'En Curso') return 'en-curso';
+  if (estado === 'Regularizada') return 'regularizada'; // New class
   return 'pendiente';
 }
 
@@ -174,11 +189,17 @@ function estaAprobada(nombreMateria) {
   return materia && materia.estado === 'Aprobada';
 }
 
+function estaRegularizada(nombreMateria) {
+    const materia = getMateriaPorNombre(nombreMateria);
+    return materia && (materia.estado === 'Aprobada' || materia.estado === 'Regularizada');
+}
+
 function habilitada(materia) {
     if (!materia.correlativas || materia.correlativas.length === 0) {
         return true;
     }
-    return materia.correlativas.every(correl => estaAprobada(correl));
+    // A materia is habilitada if all its correlativas are Aprobada or Regularizada
+    return materia.correlativas.every(correl => estaRegularizada(correl));
 }
 
 function actualizarBarraProgreso() {
@@ -192,8 +213,53 @@ function actualizarBarraProgreso() {
 
   const porcentaje = totalMaterias === 0 ? 0 : (materiasAprobadas / totalMaterias) * 100;
   const progressBar = document.getElementById('progress-bar');
-  progressBar.style.height = `${porcentaje}%`;
+  const progressText = document.getElementById('progress-text');
+
+  progressBar.style.width = `${porcentaje}%`;
+  progressText.textContent = `${Math.round(porcentaje)}%`;
 }
+
+// Collapse functionality
+function toggleCollapse(year) {
+    const yearColumn = document.querySelector(`.year-column[data-year="${year}"]`);
+    if (yearColumn) {
+        yearColumn.classList.toggle('collapsed');
+        if (collapsedYears.includes(year)) {
+            collapsedYears = collapsedYears.filter(y => y !== year);
+        } else {
+            collapsedYears.push(year);
+        }
+        guardarEstadoColapsado();
+    }
+}
+
+function toggleCollapseAll() {
+    const allYearColumns = document.querySelectorAll('.year-column');
+    const allCompletedYears = [];
+
+    // Identify years where ALL materias are Aprobada
+    for (const [anio, lista] of Object.entries(materias)) {
+        if (lista.every(materia => materia.estado === 'Aprobada')) {
+            allCompletedYears.push(anio);
+        }
+    }
+
+    const toggleBtn = document.getElementById('toggle-collapse-btn');
+
+    if (collapsedYears.length === allCompletedYears.length && collapsedYears.every(y => allCompletedYears.includes(y))) {
+        // All completed years are currently collapsed, so expand all
+        collapsedYears = []; // Clear collapsed state
+        toggleBtn.textContent = 'Comprimir Años Completados';
+    } else {
+        // Not all completed years are collapsed, so collapse them
+        collapsedYears = allCompletedYears; // Set collapsed to all completed
+        toggleBtn.textContent = 'Expandir Todos los Años';
+    }
+
+    guardarEstadoColapsado();
+    crearMalla(); // Re-render the malla to apply new collapse states
+}
+
 
 // Initial load
 document.addEventListener('DOMContentLoaded', () => {
