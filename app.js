@@ -202,16 +202,27 @@ function habilitada(materia) {
     return materia.correlativas.every(correl => estaRegularizada(correl));
 }
 
+// Función para obtener el color de la barra en relación al porcentaje
 function getColorForPercentage(percent) {
-  let r, g, b = 0;
-  if (percent < 50) {
-    // Red to Yellow (0-50%)
-    r = 255;
-    g = Math.round(255 * (percent / 50)); // Green goes from 0 to 255
+  let r, g, b;
+
+  // Colores de referencia más suaves
+  const red = [229, 115, 115];    // Un rojo suave (Material Design - Red 300)
+  const yellow = [255, 202, 40];  // Un amarillo suave (Material Design - Amber 500)
+  const green = [129, 199, 132];  // Un verde suave (Material Design - Green 300)
+
+  if (percent <= 50) {
+    // Transición de Rojo a Amarillo
+    const ratio = percent / 50;
+    r = Math.round(red[0] + ratio * (yellow[0] - red[0]));
+    g = Math.round(red[1] + ratio * (yellow[1] - red[1]));
+    b = Math.round(red[2] + ratio * (yellow[2] - red[2]));
   } else {
-    // Yellow to Green (50-100%)
-    g = 255;
-    r = Math.round(255 * ((50 - (percent - 50)) / 50)); // Red goes from 255 to 0
+    // Transición de Amarillo a Verde
+    const ratio = (percent - 50) / 50;
+    r = Math.round(yellow[0] + ratio * (green[0] - yellow[0]));
+    g = Math.round(yellow[1] + ratio * (green[1] - yellow[1]));
+    b = Math.round(yellow[2] + ratio * (green[2] - yellow[2]));
   }
   return `rgb(${r},${g},${b})`;
 }
@@ -233,19 +244,17 @@ function actualizarBarraProgreso() {
   // Set the width of the inner bar (the filled part)
   progressBar.style.width = `${porcentaje}%`;
 
-  // Set the background color based on the percentage
+  // Set the background color based on the percentage using the new, softer palette
   progressBar.style.background = getColorForPercentage(porcentaje);
 
 
   // Update the percentage text
   progressText.textContent = `${Math.round(porcentaje)}%`;
 
-  // Position the text dynamically based on the percentage
-  // It should be within the filled bar if possible, otherwise at the start.
-  // We'll calculate its position relative to the container for more control.
-  // The 10px offset from the left.
+  // Posicionar el texto y la estrella con los nuevos retiros
   const containerWidth = progressBarContainer.offsetWidth;
-  // Use a temporary element to measure text width accurately before it's rendered in its final position
+
+  // Medir el ancho del texto para un posicionamiento preciso
   const tempText = document.createElement('span');
   tempText.style.visibility = 'hidden';
   tempText.style.position = 'absolute';
@@ -255,26 +264,41 @@ function actualizarBarraProgreso() {
   document.body.removeChild(tempText);
 
 
-  let textPosition = (porcentaje / 100) * containerWidth - (textWidth / 2); // Center text within the current fill or near the end
+  // Definir offsets mejorados
+  const textLeftOffset = 15; // Offset del texto desde el inicio de la barra
+  const starTotalWidth = 30; // Ancho aproximado de la estrella + su espacio, para cálculo de colisión
+  const spaceBetweenTextAndStar = 10; // Espacio mínimo deseado entre el texto y la estrella
 
-  // Define offsets for text and star
-  const textOffset = 10; // Offset from the left of the filled bar
-  const starWidth = 20; // Approximate width of the star icon (adjust if needed)
-  const starOffset = 20; // Offset from the right of the filled bar (to not touch text)
+  let actualTextPosition;
+
+  // Calculamos la posición deseada si el texto estuviera "fijo" al inicio de la barra
+  const fixedStartPos = textLeftOffset;
+
+  // Calculamos la posición deseada si el texto estuviera cerca de la estrella
+  // Consideramos el final de la barra, restamos el ancho de la estrella + espacio, y el ancho del texto
+  const endOfBarPos = (porcentaje / 100) * containerWidth;
+  const posNearStar = endOfBarPos - starTotalWidth - spaceBetweenTextAndStar - textWidth;
 
 
-  // Calculate text position:
-  // Option 1: fixed at the beginning of the bar (if bar is too small)
-  let actualTextPosition = textOffset;
-  // Option 2: Centered in the filled portion, but bounded by the container
-  // If the filled bar is wide enough, center the text within it
-  if ((porcentaje / 100) * containerWidth > (textWidth + textOffset + starWidth + starOffset)) { // If there's enough space for text and star
-      actualTextPosition = (porcentaje / 100) * containerWidth / 2 - textWidth / 2;
-  } else { // If not enough space, place it at the start or near the star
-      actualTextPosition = Math.max(textOffset, (porcentaje / 100) * containerWidth - textWidth - starOffset - starWidth);
+  // Lógica para decidir la posición del texto:
+  // Si la barra es lo suficientemente ancha para contener el texto y la estrella cómodamente,
+  // podemos intentar centrar el texto o ponerlo en una posición más avanzada dentro de la barra.
+  // Si no, lo mantenemos en el inicio de la barra.
+
+  // Si el porcentaje es muy bajo, mantener el texto cerca del inicio del contenedor.
+  if (porcentaje < 10) { // Umbral para mantener el texto al inicio
+      actualTextPosition = fixedStartPos;
+  } else if (endOfBarPos > (textWidth + textLeftOffset + starTotalWidth + spaceBetweenTextAndStar)) {
+      // Si hay espacio suficiente, centrar el texto en la parte llena de la barra
+      actualTextPosition = endOfBarPos - (textWidth / 2) - (starTotalWidth / 2); // Intenta centrar en el espacio disponible antes de la estrella
+      // Asegurarse de que no se superponga con el inicio
+      actualTextPosition = Math.max(actualTextPosition, fixedStartPos);
+  } else {
+      // Si el espacio es limitado, el texto se moverá hacia la estrella
+      actualTextPosition = Math.max(fixedStartPos, posNearStar);
   }
 
-  // Ensure text doesn't go off the right edge of the container
+  // Asegurarse de que el texto no se salga del borde derecho del contenedor
   actualTextPosition = Math.min(actualTextPosition, containerWidth - textWidth - 5);
 
 
