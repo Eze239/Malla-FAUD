@@ -46,10 +46,7 @@ h1 {
   border-radius: 15px; /* More rounded */
   overflow: hidden;
   box-shadow: 0 0 5px rgba(0,0,0,0.2);
-  display: flex;
-  align-items: center; /* Center text vertically */
-  justify-content: center; /* Center text horizontally */
-  position: relative; /* For percentage text */
+  position: relative; /* Needed for positioning the inner bar */
 }
 
 #progress-bar {
@@ -58,19 +55,36 @@ h1 {
   background: linear-gradient(to right, #dc3545, #ffc107, #28a745); /* Red, Yellow, Green */
   transition: width 0.5s ease-out;
   border-radius: 15px; /* Match container */
-  position: absolute; /* To allow text on top */
+  position: absolute; /* To allow text and icon positioning */
   left: 0;
   top: 0;
-  z-index: 1; /* Below text */
+  z-index: 1; /* Below text and icon if they are higher */
+  display: flex; /* For aligning content within the bar */
+  align-items: center; /* Vertically center content */
 }
 
 #progress-text {
-  position: relative; /* To be on top of the bar */
-  z-index: 2; /* Above bar */
+  position: absolute; /* Position relative to #progress-bar-container */
+  left: 5px; /* Slight offset from the inner left edge */
   color: #333; /* Darker text for visibility */
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* White shadow for contrast */
+  z-index: 2; /* Above the bar fill */
+  transition: left 0.5s ease-out; /* Smooth movement for the text */
 }
+
+/* Star icon at the end of the progress bar */
+#progress-bar::after {
+  content: '⭐'; /* Star emoji */
+  font-size: 1.2em; /* Adjust size as needed */
+  position: absolute;
+  right: -15px; /* Adjust to move star slightly outside/at the very end */
+  transform: translateY(-50%);
+  top: 50%;
+  z-index: 2; /* Ensure it's above the bar fill */
+  transition: right 0.5s ease-out; /* Smooth movement for the star */
+}
+
 
 /* Collapse Button */
 #toggle-collapse-btn {
