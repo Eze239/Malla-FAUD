@@ -8,10 +8,21 @@ body {
 h1 {
   text-align: center;
   color: #a12623;
+  margin-bottom: 20px;
 }
+
+/* Controls Container */
+#controls-container {
+  display: flex;
+  flex-direction: column; /* Stack filters, progress, and button */
+  align-items: center; /* Center horizontally */
+  margin-bottom: 20px;
+  gap: 15px; /* Space between elements */
+}
+
+/* Filters */
 #filters {
   text-align: center;
-  margin-bottom: 20px;
 }
 #filters button {
   margin: 5px;
@@ -21,10 +32,61 @@ h1 {
   background: #a12623;
   color: white;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 #filters button:hover {
   background: #7e1d1b;
 }
+
+/* Progress Bar */
+#progress-bar-container {
+  width: 80%; /* Wider horizontal bar */
+  height: 30px; /* Thicker bar */
+  background-color: #eee;
+  border-radius: 15px; /* More rounded */
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center; /* Center text vertically */
+  justify-content: center; /* Center text horizontally */
+  position: relative; /* For percentage text */
+}
+
+#progress-bar {
+  height: 100%;
+  width: 0%; /* Will be set by JS */
+  background: linear-gradient(to right, #dc3545, #ffc107, #28a745); /* Red, Yellow, Green */
+  transition: width 0.5s ease-out;
+  border-radius: 15px; /* Match container */
+  position: absolute; /* To allow text on top */
+  left: 0;
+  top: 0;
+  z-index: 1; /* Below text */
+}
+
+#progress-text {
+  position: relative; /* To be on top of the bar */
+  z-index: 2; /* Above bar */
+  color: #333; /* Darker text for visibility */
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* White shadow for contrast */
+}
+
+/* Collapse Button */
+#toggle-collapse-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background: #007bff; /* Blue color */
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+#toggle-collapse-btn:hover {
+  background: #0056b3;
+}
+
+/* Malla Layout */
 .years-container {
   display: flex;
   flex-wrap: wrap;
@@ -37,12 +99,24 @@ h1 {
   padding: 15px;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: max-height 0.5s ease-out, padding 0.5s ease-out; /* For collapse animation */
+  overflow: hidden; /* Hide overflow when collapsed */
 }
 .year-column h2 {
   text-align: center;
   border-bottom: 2px solid #a12623;
   padding-bottom: 10px;
+  cursor: pointer; /* Indicate it's clickable */
 }
+.year-column.collapsed {
+  max-height: 60px; /* Just enough to show the title */
+  padding-bottom: 0;
+}
+.year-column.collapsed .card {
+  display: none; /* Hide cards when collapsed */
+}
+
+/* Card Styles */
 .card {
   background: #f9f9f9;
   margin: 10px 0;
@@ -53,7 +127,7 @@ h1 {
   flex-direction: column;
   opacity: 1;
   transition: opacity 0.3s;
-  position: relative; /* Needed for correlative info */
+  position: relative;
 }
 .card.disabled {
   opacity: 0.4;
@@ -72,35 +146,16 @@ h1 {
   margin-top: 5px;
 }
 .aprobada {
-  border-left: 8px solid #28a745;
+  border-left: 8px solid #28a745; /* Green */
 }
 .en-curso {
-  border-left: 8px solid #fd7e14;
+  border-left: 8px solid #fd7e14; /* Orange */
+}
+.regularizada {
+  border-left: 8px solid #007bff; /* Blue */
 }
 .pendiente {
-  border-left: 8px solid #b0b0b0;
-}
-
-/* Progress Bar */
-#progress-bar-container {
-  position: fixed;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 80%; /* Adjust as needed */
-  background-color: #eee;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
-}
-
-#progress-bar {
-  width: 100%;
-  height: 0%; /* Will be set by JS */
-  background: linear-gradient(to top, #dc3545, #ffc107, #28a745); /* Red, Yellow, Green */
-  transition: height 0.5s ease-out;
-  border-radius: 10px;
+  border-left: 8px solid #b0b0b0; /* Grey */
 }
 .correlatives-info {
   font-size: 0.8em;
