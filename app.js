@@ -214,9 +214,33 @@ function actualizarBarraProgreso() {
   const porcentaje = totalMaterias === 0 ? 0 : (materiasAprobadas / totalMaterias) * 100;
   const progressBar = document.getElementById('progress-bar');
   const progressText = document.getElementById('progress-text');
+  const progressBarContainer = document.getElementById('progress-bar-container'); // Get the container
 
+  // Set the width of the inner bar (the filled part)
   progressBar.style.width = `${porcentaje}%`;
+
+  // Update the percentage text
   progressText.textContent = `${Math.round(porcentaje)}%`;
+
+  // Position the text dynamically based on the percentage
+  // It should be within the filled bar if possible, otherwise at the start.
+  // We'll calculate its position relative to the container for more control.
+  // The 5px offset from the left.
+  const containerWidth = progressBarContainer.offsetWidth;
+  const textWidth = progressText.offsetWidth; // Get text width for better positioning
+  let textPosition = (porcentaje / 100) * containerWidth - textWidth - 5; // Position at the end of the fill, minus text width, minus offset
+
+  // Ensure text doesn't go off the left edge, stay at 5px minimum from container left
+  if (textPosition < 5) {
+      textPosition = 5;
+  }
+  // Ensure text doesn't go off the right edge (of the container), stay at containerWidth - textWidth - 5px max
+  if (textPosition > (containerWidth - textWidth - 5)) {
+    textPosition = containerWidth - textWidth - 5;
+  }
+
+
+  progressText.style.left = `${textPosition}px`;
 }
 
 // Collapse functionality
