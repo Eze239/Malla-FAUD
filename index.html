@@ -1,1 +1,35 @@
-...
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malla Interactiva - FAUD UNC</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Malla Interactiva - Arquitectura FAUD UNC</h1>
+
+  <div id="filters">
+    <select id="nivelFilter">
+      <option value="Todos">Todos los niveles</option>
+      <option value="1">Nivel I</option>
+      <option value="2">Nivel II</option>
+      <option value="3">Nivel III</option>
+      <option value="4">Nivel IV</option>
+      <option value="5">Nivel V</option>
+      <option value="6">Nivel VI</option>
+    </select>
+    <select id="estadoFilter">
+      <option value="Todas">Todos los estados</option>
+      <option value="Aprobada">Aprobadas</option>
+      <option value="Promocionado">Promocionadas</option>
+      <option value="En Curso">En Curso</option>
+      <option value="Pendiente">Pendientes</option>
+    </select>
+  </div>
+
+  <div id="malla" class="grid"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
