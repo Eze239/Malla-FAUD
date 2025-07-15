@@ -1,4 +1,3 @@
-
 body {
   font-family: Arial, sans-serif;
   background: #f3f3f3;
@@ -54,14 +53,23 @@ h1 {
   flex-direction: column;
   opacity: 1;
   transition: opacity 0.3s;
+  position: relative; /* Needed for correlative info */
 }
 .card.disabled {
   opacity: 0.4;
   pointer-events: none;
 }
-.card select {
+.card select, .card input[type="number"] {
   margin-top: 8px;
   padding: 5px;
+  width: calc(100% - 12px);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.card .period {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
 }
 .aprobada {
   border-left: 8px solid #28a745;
@@ -71,4 +79,32 @@ h1 {
 }
 .pendiente {
   border-left: 8px solid #b0b0b0;
+}
+
+/* Progress Bar */
+#progress-bar-container {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 80%; /* Adjust as needed */
+  background-color: #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+#progress-bar {
+  width: 100%;
+  height: 0%; /* Will be set by JS */
+  background: linear-gradient(to top, #dc3545, #ffc107, #28a745); /* Red, Yellow, Green */
+  transition: height 0.5s ease-out;
+  border-radius: 10px;
+}
+.correlatives-info {
+  font-size: 0.8em;
+  color: #d33;
+  margin-top: 5px;
+  font-weight: bold;
 }
