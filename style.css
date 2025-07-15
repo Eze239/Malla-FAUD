@@ -21,9 +21,6 @@ h1 {
 }
 
 /* Filters */
-#filters {
-  text-align: center;
-}
 #filters button {
   margin: 5px;
   padding: 10px 15px;
@@ -78,7 +75,7 @@ h1 {
   content: '⭐'; /* Emoji de estrella */
   font-size: 1.6em; /* Tamaño ajustado para que quede bien contenido */
   position: absolute;
-  right: -25px; /* Retiro mayor para que no toque el texto del porcentaje */
+  right: -0.8em; /* Centra la estrella con la punta de la barra (0.8em es la mitad de 1.6em) */
   transform: translateY(-50%);
   top: 50%;
   z-index: 2;
