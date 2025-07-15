@@ -52,10 +52,10 @@ h1 {
 #progress-bar {
   height: 100%;
   width: 0%; /* Will be set by JS */
-  background: linear-gradient(to right, #dc3545, #ffc107, #28a745); /* Red, Yellow, Green */
+  /* El degradado de color se aplicará dinámicamente en app.js */
   transition: width 0.5s ease-out;
   border-radius: 15px; /* Match container */
-  position: absolute; /* To allow text and icon positioning */
+  position: absolute;
   left: 0;
   top: 0;
   z-index: 1; /* Below text and icon if they are higher */
@@ -65,7 +65,7 @@ h1 {
 
 #progress-text {
   position: absolute; /* Position relative to #progress-bar-container */
-  left: 5px; /* Slight offset from the inner left edge */
+  left: 10px; /* Increased offset from the left edge */
   color: #333; /* Darker text for visibility */
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* White shadow for contrast */
@@ -76,9 +76,9 @@ h1 {
 /* Star icon at the end of the progress bar */
 #progress-bar::after {
   content: '⭐'; /* Star emoji */
-  font-size: 1.2em; /* Adjust size as needed */
+  font-size: 1.8em; /* Made slightly larger to fit height better */
   position: absolute;
-  right: -15px; /* Adjust to move star slightly outside/at the very end */
+  right: -20px; /* Adjusted to move star further from text */
   transform: translateY(-50%);
   top: 50%;
   z-index: 2; /* Ensure it's above the bar fill */
