@@ -247,52 +247,34 @@ function actualizarBarraProgreso() {
   // Set the background color based on the percentage using the new, softer palette
   progressBar.style.background = getColorForPercentage(porcentaje);
 
-
-  // Update the percentage text
+  // Update the percentage text content FIRST so its width can be measured accurately
   progressText.textContent = `${Math.round(porcentaje)}%`;
 
-  // Medir el ancho del texto para un posicionamiento preciso
-  const tempText = document.createElement('span');
-  tempText.style.visibility = 'hidden';
-  tempText.style.position = 'absolute';
-  tempText.textContent = progressText.textContent;
-  document.body.appendChild(tempText);
-  const textWidth = tempText.offsetWidth;
-  document.body.removeChild(tempText);
+  // Measure textWidth *after* its content is set
+  const textWidth = progressText.offsetWidth;
 
-  // Obtener el ancho real de la barra de progreso (la parte llena)
+  // Actual rendered width of the colored bar
   const filledWidth = progressBar.offsetWidth;
 
-  // Calcular la posición ideal para centrar el texto dentro de la parte llena de la barra
-  let idealLeft = (filledWidth / 2) - (textWidth / 2);
+  let idealLeft;
 
-  // Asegurarse de que el texto no se salga del borde izquierdo (ej. si la barra es muy pequeña)
-  // El texto siempre estará al menos a 5px del borde izquierdo del CONTENEDOR
-  idealLeft = Math.max(5, idealLeft);
+  // If progress is 0%, place text near the beginning with a small offset
+  if (porcentaje === 0) {
+    idealLeft = 5;
+  } else {
+    // Calculate the left position to center the text within the *current filled width*
+    idealLeft = (filledWidth / 2) - (textWidth / 2);
 
-  // Asegurarse de que el texto no se salga del borde derecho del CONTENEDOR
-  // También dejar espacio para la estrella si está presente
-  // 1.6em (tamaño estrella) * 16px (base) = ~25.6px. Media estrella es ~12.8px.
-  // right: -0.8em; en CSS ya la centra con el final de la barra.
-  // Necesitamos que el texto no llegue hasta donde empieza la estrella.
-  // El offset de la estrella en CSS (-0.8em) ya se encarga de ubicarla.
-  // Para el texto, solo necesitamos que esté centrado en la barra llena y no se salga del contenedor.
-  // Considerando que la estrella se "sale" del final de la barra llena, el texto
-  // debería estar centrado *dentro* de la barra llena, sin invadir el espacio de la estrella.
+    // Ensure the text does not go off the left edge of the container (e.g., if bar is very short)
+    idealLeft = Math.max(5, idealLeft);
 
-  // Si la barra es lo suficientemente ancha, el texto se centrará.
-  // Si la barra es muy angosta (ej. < 10% de avance), el texto se mantendrá cerca del inicio para no superponerse con la estrella.
-  const minSpaceForTextAndStar = textWidth + (1.6 * 16) + 10; // Ancho del texto + ancho de la estrella + 10px de espacio
-  if (filledWidth < minSpaceForTextAndStar) {
-      // Si el espacio es muy reducido, no se puede centrar perfectamente sin colisión.
-      // Ubicar el texto cerca del inicio, pero asegurando que no choque con la estrella.
-      // La estrella está en el `right: -0.8em` de `progress-bar`.
-      // Entonces el texto debe terminar antes de `filledWidth - (0.8em * 2)`
-      idealLeft = Math.min(idealLeft, filledWidth - textWidth - (1.6 * 16) - 5);
-      idealLeft = Math.max(5, idealLeft); // No ir más allá del borde izquierdo
+    // Ensure the text stays within the right edge of the *filled portion* of the bar.
+    // This is crucial for "centrarlo en el espacio de la barra progresiva de color".
+    // We add a small padding (5px) from the right edge of the filled bar.
+    idealLeft = Math.min(idealLeft, filledWidth - textWidth - 5);
   }
 
-
+  // Apply the calculated left position
   progressText.style.left = `${idealLeft}px`;
 }
 
