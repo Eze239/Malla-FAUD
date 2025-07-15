@@ -41,12 +41,12 @@ const defaultMaterias = {
     { nombre: "Instalaciones III", estado: "Aprobada", nota: 5, periodo: "ANUAL", correlativas: ["Instalaciones II"] }
   ],
   '5° Año': [
-    { nombre: "Producción y Gestión", estado: "En Curso", nota: null, periodo: "ANUAL", correlativas: ["Construcciones III"] },
+    { nombre: "Producción y Gestión", estado: "Regularizada", nota: null, periodo: "ANUAL", correlativas: ["Construcciones III"] }, // Cambiado a Regularizada para ejemplo
     { nombre: "Estructuras IV", estado: "Pendiente", nota: null, periodo: "ANUAL", correlativas: ["Estructuras III"] },
     { nombre: "Topografía", estado: "En Curso", nota: null, periodo: "ANUAL", correlativas: [] },
     { nombre: "Urbanismo II", estado: "Aprobada", nota: 6, periodo: "ANUAL", correlativas: ["Urbanismo I"] },
     { nombre: "Equipamiento", estado: "Aprobada", nota: 9, periodo: "ANUAL", correlativas: ["Arquitectura IV"] },
-    { nombre: "Arquitectura V", estado: "En Curso", nota: null, periodo: "ANUAL", correlativas: ["Arquitectura IV", "Construcciones III"] }
+    { nombre: "Arquitectura V", estado: "Regularizada", nota: null, periodo: "ANUAL", correlativas: ["Arquitectura IV", "Construcciones III"] } // Cambiado a Regularizada para ejemplo
   ],
   '6° Año': [
     { nombre: "Arquitectura VI", estado: "Pendiente", nota: null, periodo: "ANUAL", correlativas: ["Arquitectura V"] }
@@ -202,6 +202,20 @@ function habilitada(materia) {
     return materia.correlativas.every(correl => estaRegularizada(correl));
 }
 
+function getColorForPercentage(percent) {
+  let r, g, b = 0;
+  if (percent < 50) {
+    // Red to Yellow (0-50%)
+    r = 255;
+    g = Math.round(255 * (percent / 50)); // Green goes from 0 to 255
+  } else {
+    // Yellow to Green (50-100%)
+    g = 255;
+    r = Math.round(255 * ((50 - (percent - 50)) / 50)); // Red goes from 255 to 0
+  }
+  return `rgb(${r},${g},${b})`;
+}
+
 function actualizarBarraProgreso() {
   let totalMaterias = 0;
   let materiasAprobadas = 0;
@@ -214,10 +228,14 @@ function actualizarBarraProgreso() {
   const porcentaje = totalMaterias === 0 ? 0 : (materiasAprobadas / totalMaterias) * 100;
   const progressBar = document.getElementById('progress-bar');
   const progressText = document.getElementById('progress-text');
-  const progressBarContainer = document.getElementById('progress-bar-container'); // Get the container
+  const progressBarContainer = document.getElementById('progress-bar-container');
 
   // Set the width of the inner bar (the filled part)
   progressBar.style.width = `${porcentaje}%`;
+
+  // Set the background color based on the percentage
+  progressBar.style.background = getColorForPercentage(porcentaje);
+
 
   // Update the percentage text
   progressText.textContent = `${Math.round(porcentaje)}%`;
@@ -225,22 +243,42 @@ function actualizarBarraProgreso() {
   // Position the text dynamically based on the percentage
   // It should be within the filled bar if possible, otherwise at the start.
   // We'll calculate its position relative to the container for more control.
-  // The 5px offset from the left.
+  // The 10px offset from the left.
   const containerWidth = progressBarContainer.offsetWidth;
-  const textWidth = progressText.offsetWidth; // Get text width for better positioning
-  let textPosition = (porcentaje / 100) * containerWidth - textWidth - 5; // Position at the end of the fill, minus text width, minus offset
+  // Use a temporary element to measure text width accurately before it's rendered in its final position
+  const tempText = document.createElement('span');
+  tempText.style.visibility = 'hidden';
+  tempText.style.position = 'absolute';
+  tempText.textContent = progressText.textContent;
+  document.body.appendChild(tempText);
+  const textWidth = tempText.offsetWidth;
+  document.body.removeChild(tempText);
 
-  // Ensure text doesn't go off the left edge, stay at 5px minimum from container left
-  if (textPosition < 5) {
-      textPosition = 5;
+
+  let textPosition = (porcentaje / 100) * containerWidth - (textWidth / 2); // Center text within the current fill or near the end
+
+  // Define offsets for text and star
+  const textOffset = 10; // Offset from the left of the filled bar
+  const starWidth = 20; // Approximate width of the star icon (adjust if needed)
+  const starOffset = 20; // Offset from the right of the filled bar (to not touch text)
+
+
+  // Calculate text position:
+  // Option 1: fixed at the beginning of the bar (if bar is too small)
+  let actualTextPosition = textOffset;
+  // Option 2: Centered in the filled portion, but bounded by the container
+  // If the filled bar is wide enough, center the text within it
+  if ((porcentaje / 100) * containerWidth > (textWidth + textOffset + starWidth + starOffset)) { // If there's enough space for text and star
+      actualTextPosition = (porcentaje / 100) * containerWidth / 2 - textWidth / 2;
+  } else { // If not enough space, place it at the start or near the star
+      actualTextPosition = Math.max(textOffset, (porcentaje / 100) * containerWidth - textWidth - starOffset - starWidth);
   }
-  // Ensure text doesn't go off the right edge (of the container), stay at containerWidth - textWidth - 5px max
-  if (textPosition > (containerWidth - textWidth - 5)) {
-    textPosition = containerWidth - textWidth - 5;
-  }
+
+  // Ensure text doesn't go off the right edge of the container
+  actualTextPosition = Math.min(actualTextPosition, containerWidth - textWidth - 5);
 
 
-  progressText.style.left = `${textPosition}px`;
+  progressText.style.left = `${actualTextPosition}px`;
 }
 
 // Collapse functionality
