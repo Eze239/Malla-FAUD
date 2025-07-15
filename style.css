@@ -42,47 +42,47 @@ h1 {
 #progress-bar-container {
   width: 80%; /* Wider horizontal bar */
   height: 30px; /* Thicker bar */
-  background-color: #eee;
-  border-radius: 15px; /* More rounded */
+  background-color: #e0e0e0; /* Un color gris claro y suave para el fondo */
+  border-radius: 15px; /* Más redondeado para coincidir con la imagen */
   overflow: hidden;
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
-  position: relative; /* Needed for positioning the inner bar */
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); /* Sutil sombra interna para profundidad */
+  position: relative;
 }
 
 #progress-bar {
   height: 100%;
   width: 0%; /* Will be set by JS */
-  /* El degradado de color se aplicará dinámicamente en app.js */
-  transition: width 0.5s ease-out;
-  border-radius: 15px; /* Match container */
+  /* El color de fondo se establecerá dinámicamente en app.js */
+  transition: width 0.5s ease-out, background-color 0.5s ease-out; /* Transición suave también para el color */
+  border-radius: 15px; /* Coincide con el contenedor */
   position: absolute;
   left: 0;
   top: 0;
-  z-index: 1; /* Below text and icon if they are higher */
-  display: flex; /* For aligning content within the bar */
-  align-items: center; /* Vertically center content */
+  z-index: 1;
+  display: flex;
+  align-items: center;
 }
 
 #progress-text {
-  position: absolute; /* Position relative to #progress-bar-container */
-  left: 10px; /* Increased offset from the left edge */
-  color: #333; /* Darker text for visibility */
+  position: absolute;
+  /* Posición 'left' se manejará completamente en JavaScript para un control preciso */
+  color: #333; /* Color de texto oscuro para contraste */
   font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* White shadow for contrast */
-  z-index: 2; /* Above the bar fill */
-  transition: left 0.5s ease-out; /* Smooth movement for the text */
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* Sombra blanca para mejor legibilidad */
+  z-index: 2;
+  transition: left 0.5s ease-out; /* Movimiento suave para el texto */
 }
 
 /* Star icon at the end of the progress bar */
 #progress-bar::after {
-  content: '⭐'; /* Star emoji */
-  font-size: 1.8em; /* Made slightly larger to fit height better */
+  content: '⭐'; /* Emoji de estrella */
+  font-size: 1.6em; /* Tamaño ajustado para que quede bien contenido */
   position: absolute;
-  right: -20px; /* Adjusted to move star further from text */
+  right: -25px; /* Retiro mayor para que no toque el texto del porcentaje */
   transform: translateY(-50%);
   top: 50%;
-  z-index: 2; /* Ensure it's above the bar fill */
-  transition: right 0.5s ease-out; /* Smooth movement for the star */
+  z-index: 2;
+  transition: right 0.5s ease-out;
 }
 
 
