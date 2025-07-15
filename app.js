@@ -1,1 +1,28 @@
-...
+const materias = [
+  { nombre: "Introducción a la Problemática del Diseño y su Expresión", nivel: 1, modalidad: "A", nota: "", estado: "Promocionado" },
+  { nombre: "Estrategias de Aprendizaje", nivel: 1, modalidad: "A", nota: "", estado: "Promocionado" },
+  { nombre: "Introducción a la Tecnología", nivel: 1, modalidad: "A", nota: 7, estado: "Aprobada" },
+  { nombre: "Introducción a la Historia de la Arquitectura y el Urbanismo", nivel: 1, modalidad: "A", nota: 10, estado: "Aprobada" },
+  { nombre: "Sistemas Gráficos de Expresión", nivel: 1, modalidad: "A", nota: 10, estado: "Promocionado" },
+  { nombre: "Morfología I", nivel: 1, modalidad: "A", nota: 9, estado: "Promocionado" },
+  { nombre: "Arquitectura I", nivel: 1, modalidad: "A", nota: 10, estado: "Promocionado" },
+  { nombre: "Matemática I", nivel: 1, modalidad: "1C", nota: 8, estado: "Aprobada" },
+  { nombre: "Física", nivel: 1, modalidad: "1C", nota: 7, estado: "Promocionado" },
+
+  { nombre: "Construcciones I", nivel: 2, modalidad: "A", nota: 7, estado: "Aprobada" },
+  { nombre: "Instalaciones I", nivel: 2, modalidad: "A", nota: 8, estado: "Aprobada" },
+  { nombre: "Estructuras I", nivel: 2, modalidad: "A", nota: 8, estado: "Aprobada" },
+  { nombre: "Historia de la Arquitectura I", nivel: 2, modalidad: "A", nota: 5, estado: "Aprobada" },
+  { nombre: "Teorías y Métodos", nivel: 2, modalidad: "A", nota: 7, estado: "Aprobada" },
+  { nombre: "Morfología II", nivel: 2, modalidad: "A", nota: 7, estado: "Promocionado" },
+  { nombre: "Arquitectura II", nivel: 2, modalidad: "A", nota: 10, estado: "Aprobada" },
+
+  { nombre: "Construcciones II", nivel: 3, modalidad: "A", nota: 9, estado: "Promocionado" },
+  { nombre: "Instalaciones II", nivel: 3, modalidad: "A", nota: 4, estado: "Aprobada" },
+  { nombre: "Estructuras II", nivel: 3, modalidad: "A", nota: 6, estado: "Aprobada" },
+  { nombre: "Historia de la Arquitectura II", nivel: 3, modalidad: "A", nota: 6, estado: "Aprobada" },
+  { nombre: "Morfología III", nivel: 3, modalidad: "A", nota: 8, estado: "Promocionado" },
+  { nombre: "Arquitectura III", nivel: 3, modalidad: "A", nota: 8, estado: "Aprobada" },
+  { nombre: "Matemática II", nivel: 3, modalidad: "1C", nota: 7, estado: "Promocionado" },
+  { nombre: "Informática", nivel: 3, modalidad: "A", nota: 8, estado: "Promocionado" },
+];
