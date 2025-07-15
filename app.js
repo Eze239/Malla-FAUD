@@ -251,9 +251,6 @@ function actualizarBarraProgreso() {
   // Update the percentage text
   progressText.textContent = `${Math.round(porcentaje)}%`;
 
-  // Posicionar el texto y la estrella con los nuevos retiros
-  const containerWidth = progressBarContainer.offsetWidth;
-
   // Medir el ancho del texto para un posicionamiento preciso
   const tempText = document.createElement('span');
   tempText.style.visibility = 'hidden';
@@ -263,46 +260,40 @@ function actualizarBarraProgreso() {
   const textWidth = tempText.offsetWidth;
   document.body.removeChild(tempText);
 
+  // Obtener el ancho real de la barra de progreso (la parte llena)
+  const filledWidth = progressBar.offsetWidth;
 
-  // Definir offsets mejorados
-  const textLeftOffset = 15; // Offset del texto desde el inicio de la barra
-  const starTotalWidth = 30; // Ancho aproximado de la estrella + su espacio, para cálculo de colisión
-  const spaceBetweenTextAndStar = 10; // Espacio mínimo deseado entre el texto y la estrella
+  // Calcular la posición ideal para centrar el texto dentro de la parte llena de la barra
+  let idealLeft = (filledWidth / 2) - (textWidth / 2);
 
-  let actualTextPosition;
+  // Asegurarse de que el texto no se salga del borde izquierdo (ej. si la barra es muy pequeña)
+  // El texto siempre estará al menos a 5px del borde izquierdo del CONTENEDOR
+  idealLeft = Math.max(5, idealLeft);
 
-  // Calculamos la posición deseada si el texto estuviera "fijo" al inicio de la barra
-  const fixedStartPos = textLeftOffset;
+  // Asegurarse de que el texto no se salga del borde derecho del CONTENEDOR
+  // También dejar espacio para la estrella si está presente
+  // 1.6em (tamaño estrella) * 16px (base) = ~25.6px. Media estrella es ~12.8px.
+  // right: -0.8em; en CSS ya la centra con el final de la barra.
+  // Necesitamos que el texto no llegue hasta donde empieza la estrella.
+  // El offset de la estrella en CSS (-0.8em) ya se encarga de ubicarla.
+  // Para el texto, solo necesitamos que esté centrado en la barra llena y no se salga del contenedor.
+  // Considerando que la estrella se "sale" del final de la barra llena, el texto
+  // debería estar centrado *dentro* de la barra llena, sin invadir el espacio de la estrella.
 
-  // Calculamos la posición deseada si el texto estuviera cerca de la estrella
-  // Consideramos el final de la barra, restamos el ancho de la estrella + espacio, y el ancho del texto
-  const endOfBarPos = (porcentaje / 100) * containerWidth;
-  const posNearStar = endOfBarPos - starTotalWidth - spaceBetweenTextAndStar - textWidth;
-
-
-  // Lógica para decidir la posición del texto:
-  // Si la barra es lo suficientemente ancha para contener el texto y la estrella cómodamente,
-  // podemos intentar centrar el texto o ponerlo en una posición más avanzada dentro de la barra.
-  // Si no, lo mantenemos en el inicio de la barra.
-
-  // Si el porcentaje es muy bajo, mantener el texto cerca del inicio del contenedor.
-  if (porcentaje < 10) { // Umbral para mantener el texto al inicio
-      actualTextPosition = fixedStartPos;
-  } else if (endOfBarPos > (textWidth + textLeftOffset + starTotalWidth + spaceBetweenTextAndStar)) {
-      // Si hay espacio suficiente, centrar el texto en la parte llena de la barra
-      actualTextPosition = endOfBarPos - (textWidth / 2) - (starTotalWidth / 2); // Intenta centrar en el espacio disponible antes de la estrella
-      // Asegurarse de que no se superponga con el inicio
-      actualTextPosition = Math.max(actualTextPosition, fixedStartPos);
-  } else {
-      // Si el espacio es limitado, el texto se moverá hacia la estrella
-      actualTextPosition = Math.max(fixedStartPos, posNearStar);
+  // Si la barra es lo suficientemente ancha, el texto se centrará.
+  // Si la barra es muy angosta (ej. < 10% de avance), el texto se mantendrá cerca del inicio para no superponerse con la estrella.
+  const minSpaceForTextAndStar = textWidth + (1.6 * 16) + 10; // Ancho del texto + ancho de la estrella + 10px de espacio
+  if (filledWidth < minSpaceForTextAndStar) {
+      // Si el espacio es muy reducido, no se puede centrar perfectamente sin colisión.
+      // Ubicar el texto cerca del inicio, pero asegurando que no choque con la estrella.
+      // La estrella está en el `right: -0.8em` de `progress-bar`.
+      // Entonces el texto debe terminar antes de `filledWidth - (0.8em * 2)`
+      idealLeft = Math.min(idealLeft, filledWidth - textWidth - (1.6 * 16) - 5);
+      idealLeft = Math.max(5, idealLeft); // No ir más allá del borde izquierdo
   }
 
-  // Asegurarse de que el texto no se salga del borde derecho del contenedor
-  actualTextPosition = Math.min(actualTextPosition, containerWidth - textWidth - 5);
 
-
-  progressText.style.left = `${actualTextPosition}px`;
+  progressText.style.left = `${idealLeft}px`;
 }
 
 // Collapse functionality
